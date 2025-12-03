@@ -1,0 +1,31 @@
+# Включение mod_rewrite
+RewriteEngine On
+
+# Базовый URL (если проект в подпапке, укажите путь, например: /psychologist-system/)
+RewriteBase /
+
+# Запрет доступа к скрытым файлам и папкам
+RewriteRule ^\. - [F,L]
+RewriteRule ^(\.git|\.env|storage|config|vendor) - [F,L]
+
+# Если запрашиваемый файл или папка существуют, обслуживать их напрямую
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+
+# Перенаправление всех остальных запросов на index.php
+RewriteRule ^(.*)$ index.php [QSA,L]
+
+# Заголовки безопасности
+<IfModule mod_headers.c>
+    Header set X-Content-Type-Options "nosniff"
+    Header set X-Frame-Options "DENY"
+    Header set X-XSS-Protection "1; mode=block"
+</IfModule>
+
+# Запрет просмотра содержимого папок
+Options -Indexes
+
+# Обработка ошибок
+ErrorDocument 403 /templates/errors/403.php
+ErrorDocument 404 /templates/errors/404.php
+ErrorDocument 500 /templates/errors/500.php
